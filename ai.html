@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traveler's Trivia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #f2f0e9; font-family: 'Lora', serif; color: #2e3e2b; text-align: center; padding: 20px; }
+        .quiz-container { max-width: 600px; margin: 50px auto; background: #ffffff; padding: 40px; border-radius: 4px; box-shadow: 0 15px 35px rgba(46, 62, 43, 0.15); border-top: 12px solid #3a4a38; }
+        h1 { font-family: 'Playfair Display', serif; color: #3a4a38; font-size: 2.5rem; margin-bottom: 10px; }
+        #question-text { font-size: 1.2rem; margin-bottom: 30px; color: #51634b; }
+        .option-btn { display: block; width: 100%; padding: 15px; margin: 12px 0; background-color: #ffffff; border: 2px solid #e0dccf; border-radius: 4px; cursor: pointer; font-family: 'Lora', serif; font-size: 16px; transition: all 0.3s ease; color: #3a4a38; }
+        .option-btn:hover:not(:disabled) { background-color: #fdfaf0; border-color: #bc6c25; }
+        #next-btn, .restart-btn { display:none; margin: 30px auto 0; padding: 14px 30px; background-color: #bc6c25; color: #ffffff; border: none; border-radius: 4px; cursor: pointer; font-family: 'Lora', serif; font-weight: bold; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; }
+        #next-btn:hover, .restart-btn:hover { background-color: #a65d1f; }
+        #result-area { margin-top: 25px; font-weight: bold; min-height: 30px; }
+        .nav-link { display: inline-block; margin-top: 40px; color: #bc6c25; text-decoration: none; font-weight: bold; }
+        .correct { border-color: #606c38 !important; background-color: #f0f4ef !important; }
+        .wrong { border-color: #bc6c25 !important; background-color: #fff9f4 !important; }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <h1 id="quiz-title">Traveler's Trivia</h1>
+        <p id="question-text">Preparing your passport...</p>
+        <div id="options-container"></div>
+        <div id="result-area"></div>
+        <button id="next-btn">Continue Journey</button>
+    </div>
+
+    <a href="fromScratch.html" class="nav-link">← Return to Bucket List</a>
+
+    <script>
+        // Ensure the script runs only after the HTML is fully loaded
+        window.onload = function() {
+            const quizData = [
+                { q: "Which country is home to the Matterhorn peak?", a: ["Canada", "Switzerland", "Italy", "France"], correct: "Switzerland" },
+                { q: "What is the largest national park in the world?", a: ["Yellowstone", "Northeast Greenland", "Banff", "Kruger"], correct: "Northeast Greenland" },
+                { q: "Which city is known as the 'City of Canals'?", a: ["London", "Amsterdam", "Venice", "Paris"], correct: "Venice" },
+                { q: "Banff National Park is located in which mountain range?", a: ["Andes", "Himalayas", "Rockies", "Alps"], correct: "Rockies" }
+            ];
+
+            let currentIdx = 0;
+            let score = 0;
+
+            const questionEl = document.getElementById("question-text");
+            const optionsCont = document.getElementById("options-container");
+            const resultArea = document.getElementById("result-area");
+            const nextBtn = document.getElementById("next-btn");
+
+            function loadQuestion() {
+                const current = quizData[currentIdx];
+                questionEl.innerText = current.q;
+                optionsCont.innerHTML = "";
+                resultArea.innerText = "";
+                nextBtn.style.display = "none";
+
+                current.a.forEach(opt => {
+                    const btn = document.createElement("button");
+                    btn.innerText = opt;
+                    btn.className = "option-btn";
+                    btn.onclick = () => checkAnswer(opt, btn);
+                    optionsCont.appendChild(btn);
+                });
+            }
+
+            function checkAnswer(selected, btn) {
+                const correct = quizData[currentIdx].correct;
+                if (selected === correct) {
+                    resultArea.innerText = "✅ Excellent Discovery!";
+                    resultArea.style.color = "#606c38";
+                    btn.classList.add("correct");
+                    score++;
+                } else {
+                    resultArea.innerText = "❌ Not quite. The answer is " + correct;
+                    resultArea.style.color = "#bc6c25";
+                    btn.classList.add("wrong");
+                }
+                
+                Array.from(optionsCont.children).forEach(b => b.disabled = true);
+                nextBtn.style.display = "block";
+            }
+
+            nextBtn.onclick = () => {
+                currentIdx++;
+                if (currentIdx < quizData.length) {
+                    loadQuestion();
+                } else {
+                    document.querySelector(".quiz-container").innerHTML = `
+                        <h1>Expedition Over</h1>
+                        <p style='font-size: 1.2rem;'>You discovered ${score} out of ${quizData.length} truths.</p>
+                        <button onclick='location.reload()' class='restart-btn' style='display:block;'>Restart Quiz</button>
+                    `;
+                }
+            };
+
+            // Kick off the first question
+            loadQuestion();
+        };
+    </script>
+</body>
+</html>
